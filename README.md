@@ -13,9 +13,13 @@ $ApiClient = new DiCMSApiClient(
 ```
 $groups = $ApiClient->get("groups", array( start => 0 , limit =>10 ));
 ```
-###get users
+###get all users from group id 131
 ```
 $users = $ApiClient->get("users", array( parent_oid => 131, start => 0 , limit =>10 ));
+```
+###get all user information
+```
+$users = $ApiClient->get("users/3", array( ));
 ```
 ###set user fields
 You could set some user fields, for example 'carma' with user id 3
