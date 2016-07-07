@@ -4,13 +4,13 @@ require_once('apiclient.inc.php');
 $ApiClient = new DiCMSApiClient(
     array(
         'login' => 'admin',
-        'api_key' => '585bf595d6616d4726db763ace3c87aa',
-        'api_url' => 'http://www.testsite.ru/adm/api/'
+        'api_key' => 'API_KEY',
+        'api_url' => 'http://www.site.com/adm/api/'
     )
 );
 
 $data = array(
-    firstname => 'Дима',
+    firstname => 'Dmitry',
     phone => '123234',
     s_phone => '+7 123234',
     s_address => 'asdasd'
