@@ -89,10 +89,37 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
      * @depends testSendValidInitRequest
      * @expectedException \InvalidArgumentException
      */
-    public function testSendInvalidObjectUrl($instance)
+    public function testSendInvalidObjectUrlForGet($instance)
     {
     	$response = $instance->get("");
+	}
+
+    /**
+     * @depends testSendValidInitRequest
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSendInvalidObjectUrlForUpdate($instance)
+    {
+    	$response = $instance->update("", []);
     }
+
+    /**
+     * @depends testSendValidInitRequest
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSendInvalidObjectUrlForCreate($instance)
+    {
+    	$response = $instance->create("", []);
+	}
+
+	/**
+     * @depends testSendValidInitRequest
+     * @expectedException \InvalidArgumentException
+     */
+    public function testSendInvalidObjectUrlForDelete($instance)
+    {
+    	$response = $instance->delete("", []);
+	}
 
     /**
      * @depends testValidInit
@@ -116,6 +143,107 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
     public function testGetApiUrl($instance)
     {
     	$this->assertEquals(static::$config['apiUrl'], $instance->getApiUrl());
+    }
+
+    /**
+     * @depends testValidInit
+     */
+    public function testGetApiVersion($instance)
+    {
+    	$this->assertTrue(!empty($instance->getApiVersion()));
+    }
+
+
+    /**
+     * @depends testValidInit
+     */
+    public function testCreateUserRequest($instance)
+    {
+    	$someUser = [
+            'parent_oid' => 4,
+            //'master_oid' => 3,
+            'name' => 'Иван',
+            'login' => 'ivan',
+            'password' => '12345',
+    	];
+
+        $response = $instance->create('users', $someUser);
+
+        print_r($response);
+
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse', 
+            $response,
+            'User was not created!'
+        );
+        $this->assertTrue($response->oid > 0, 'User was not created!');
+
+        return $response;
+    }
+
+    /**
+     * @depends testValidInit
+     * @depends testCreateUserRequest
+     */
+    public function testGetUserRequest($instance, $response)
+    {
+        $oid = $response->oid;
+
+        $response = $instance->get("users/{$oid}", []);
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse', 
+            $response,
+            'User was not received!'
+        );
+
+        print_r($response);
+
+        try {
+            $this->assertEquals($response->oid, $oid, 'User was not received!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('User was not received!');
+        }
+
+        return $response;
+    }
+
+    /**
+     * @depends testValidInit
+     * @depends testGetUserRequest
+     */
+    public function testUpdateUserRequest($instance, $response)
+    {
+        $newParendOid = 2;
+
+        $response = $instance->update("users/{$response->oid}", ['parent_oid' => $newParendOid]);
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse', 
+            $response,
+            'User was not updated!'
+        );
+        print_r($response);
+
+        try {
+            $this->assertEquals($response->oid, $oid, 'User was not received after updating!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('User was not received after updating!');
+        }
+
+        $response = $instance->get("users/{$response->oid}", []);
+        print_r($response);
+        $this->assertEquals($response->parent_oid, $newParendOid, 'User was not updated!');
+
+    }
+
+    /**
+     * @depends testValidInit
+     * @depends testCreateUserRequest
+     */
+    public function testDeleteUserRequest($instance, $response)
+    {
+        $response = $instance->delete("users/{$response->oid}", []);
+
+        print_r($response);
     }
 
     public function invalidInitConfigProvider()

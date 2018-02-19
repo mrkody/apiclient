@@ -222,6 +222,6 @@ class DiCmsApiClient
      */
     public function getCartVersion()
     {
-        return str_replace("DiCMS: version ", "", strip_tags(file_get_contents($this->apiUrl.'?version')));
+        //return str_replace("DiCMS: version ", "", strip_tags(file_get_contents($this->apiUrl.'?version')));
     }
 }
