@@ -157,51 +157,63 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
     /**
      * @depends testValidInit
      */
-    public function testCreateUserRequest($instance)
+    public function testCreateOrderRequest($instance)
     {
-    	$someUser = [
-            'parent_oid' => 4,
-            //'master_oid' => 3,
-            'name' => 'Иван',
-            'login' => 'ivan',
-            'password' => '12345',
+    	$someOrder = [
+            'master_oid' => 3,
+            'fio' => 'Ivanov Ivan Ivanovich',
+            'email' => 'ivan12@mail.ru',
+            'status' => 'A',
+            'address' => 'Москва',
+            'phone' => '+79099999999',
+            'pay_method' => 'NON',
+            'pay_status' => 'S',
+            'delivery_id' => 1,
+            'delivery' => 'courier',
+            'products' => [
+                ['oid' => 1117, 'count' => 1],
+            ],
     	];
 
-        $response = $instance->create('users', $someUser);
+        $response = $instance->update('orders', $someOrder);
 
         print_r($response);
 
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
-            'User was not created!'
+            'Order was not created!'
         );
-        $this->assertTrue($response->oid > 0, 'User was not created!');
+        try {
+            $this->assertTrue(is_numeric($response->id), 'Order was not created!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order was not created!');
+        }
 
-        return $response;
+        return $response->content;
     }
 
     /**
      * @depends testValidInit
-     * @depends testCreateUserRequest
+     * @depends testCreateOrderRequest
      */
-    public function testGetUserRequest($instance, $response)
+    public function testGetOrderRequest($instance, $response)
     {
-        $oid = $response->oid;
+        $order_id = $response['order_id'];
 
-        $response = $instance->get("users/{$oid}", []);
+        $response = $instance->get("orders/{$order_id}", []);
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
-            'User was not received!'
+            'Order was not received!'
         );
 
         print_r($response);
 
         try {
-            $this->assertEquals($response->oid, $oid, 'User was not received!');
+            $this->assertEquals($response->order_id, $order_id, 'Order was not received!');
         } catch (\InvalidArgumentException $e) {
-            $this->fail('User was not received!');
+            $this->fail('Order was not received!');
         }
 
         return $response;
@@ -209,39 +221,51 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testValidInit
-     * @depends testGetUserRequest
+     * @depends testGetOrderRequest
      */
-    public function testUpdateUserRequest($instance, $response)
+    public function testUpdateOrderRequest($instance, $response)
     {
-        $newParendOid = 2;
+        /*$oid = $response->id;
+        $newPayStatus = 'FP';
 
-        $response = $instance->update("users/{$response->oid}", ['parent_oid' => $newParendOid]);
+        $response = $instance->update("orders/{$oid}", ['pay_status' => $newPayStatus]);
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
-            'User was not updated!'
+            'Order was not updated!'
         );
+
         print_r($response);
 
         try {
-            $this->assertEquals($response->oid, $oid, 'User was not received after updating!');
+            $this->assertEquals($response->id, $oid, 'Order was not received after updating!');
         } catch (\InvalidArgumentException $e) {
-            $this->fail('User was not received after updating!');
+            $this->fail('Order was not received after updating!');
         }
 
-        $response = $instance->get("users/{$response->oid}", []);
-        print_r($response);
-        $this->assertEquals($response->parent_oid, $newParendOid, 'User was not updated!');
+        $response = $instance->get("orders/{$response->id}", []);
 
+        print_r($response);
+
+        $this->assertEquals($response->content['pay_status'], $newPayStatus, 'Order was not updated!');*/
+
+        $this->assertTrue(true);
+
+        return $response;
     }
 
     /**
      * @depends testValidInit
-     * @depends testCreateUserRequest
+     * @depends testUpdateOrderRequest
      */
-    public function testDeleteUserRequest($instance, $response)
+    public function testDeleteOrderRequest($instance, $response)
     {
-        $response = $instance->delete("users/{$response->oid}", []);
+        $response = $instance->delete("orders/{$response->order_id}");
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse', 
+            $response,
+            'Order was not deleted!'
+        );
 
         print_r($response);
     }
