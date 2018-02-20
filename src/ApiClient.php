@@ -3,22 +3,22 @@ namespace ShopExpress\ApiClient;
 
 use ShopExpress\ApiClient\Response\ApiResponse;
 use ShopExpress\ApiClient\Exception\CurlException;
-use ShopExpress\ApiClient\Exception\CsCartApiException;
+use ShopExpress\ApiClient\Exception\ApiException;
 
-class DiCmsApiClient
+class ApiClient
 {
-    const VERSION = '0.1 beta';
+    const VERSION = '0.2 beta';
     
     const ERROR_API_CALLING = 'You have to specify a method (eg. POST, PUT, ...) and a correct object url to call the API';
     const ERROR_CURL_ERROR = 'HTTP error while calling the API. Error code and message: %s - %s';
-    const ERROR_CSCART_API_MESSAGE = 'Message from API: %s';
+    const ERROR_API_MESSAGE = 'Message from API: %s';
     const ERROR_ARGUMENT_VALUE = 'Parameter `%s` can\'t be empty';
 
     public static $CURL_OPTS = [
         CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 60,
-        CURLOPT_USERAGENT => 'dicms-api-php-beta-0.1',
+        CURLOPT_USERAGENT => 'dicms-api-php-beta-0.2',
     ];
     protected $apiKey;
     protected $userLogin;
@@ -262,7 +262,7 @@ class DiCmsApiClient
 
         if (!empty($response['message'])) {
             throw new CsCartApiException(
-                sprintf(self::ERROR_CSCART_API_MESSAGE, $response['message'])
+                sprintf(self::ERROR_API_MESSAGE, $response['message'])
             );
         } else {
             return $response;

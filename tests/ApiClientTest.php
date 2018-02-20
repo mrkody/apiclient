@@ -1,9 +1,9 @@
 <?php
 namespace ShopExpress\ApiClient\Test;
 
-use ShopExpress\ApiClient\DiCmsApiClient;
+use ShopExpress\ApiClient\ApiClient;
 
-class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
+class ApiClientTest extends \PHPUnit_Framework_TestCase
 {
 	protected static $config;
 
@@ -27,12 +27,12 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testInvalidInit($apiKey, $userLogin, $apiUrl)
     {
-    	$instance = new DiCmsApiClient($apiKey, $userLogin, $apiUrl);
+    	$instance = new ApiClient($apiKey, $userLogin, $apiUrl);
     }
 
     public function testValidInit()
     {
-    	$instance = new DiCmsApiClient(static::$config['apiKey'], static::$config['userLogin'], static::$config['apiUrl']);
+    	$instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], static::$config['apiUrl']);
 
     	return $instance;
     }
@@ -54,7 +54,7 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest()
     {
-    	$instance = new DiCmsApiClient(static::$config['apiKey'], static::$config['userLogin'], "http://example.ru");
+    	$instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "http://example.ru");
     	$response = $this->simpleQuery($instance);
     }
 
@@ -63,7 +63,7 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest1()
     {
-    	$instance = new DiCmsApiClient("wrong", static::$config['userLogin'], static::$config['apiUrl']);
+    	$instance = new ApiClient("wrong", static::$config['userLogin'], static::$config['apiUrl']);
     	$response = $this->simpleQuery($instance);
     }
 
@@ -72,7 +72,7 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest2()
     {
-    	$instance = new DiCmsApiClient(static::$config['apiKey'], "wrong", static::$config['apiUrl']);
+    	$instance = new ApiClient(static::$config['apiKey'], "wrong", static::$config['apiUrl']);
     	$response = $this->simpleQuery($instance);
     }
 
@@ -81,7 +81,7 @@ class DiCmsApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest3()
     {
-    	$instance = new DiCmsApiClient(static::$config['apiKey'], static::$config['userLogin'], "example.ru");
+    	$instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "example.ru");
     	$response = $this->simpleQuery($instance);
     }
 
