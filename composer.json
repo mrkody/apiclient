@@ -1,11 +1,11 @@
 {
-    "name": "ShopExpress/apiclient",
+    "name": "ShopExpress/ApiClient",
     "description": "ShopExpress API Client",
     "keywords": [
         "ShopExpress",
         "apiclient"
     ],
-    "homepage": "https://github.com/ShopExpress/apiclient",
+    "homepage": "https://github.com/ShopExpress/ApiClient",
     "license": "MIT",
     "require": {
         "php" : ">=5.3.0",

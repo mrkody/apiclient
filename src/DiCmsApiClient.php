@@ -24,6 +24,13 @@ class DiCmsApiClient
     protected $userLogin;
     protected $apiUrl;
 
+    /**
+     * Client constructor.
+     *
+     * @param string $apiKey The api key
+     * @param string $userLogin The user login
+     * @param string $apiUrl The api url
+     */
     public function __construct($apiKey, $userLogin, $apiUrl)
     {
         $this->setApiKey($apiKey);
@@ -31,6 +38,15 @@ class DiCmsApiClient
         $this->setApiUrl($apiUrl);
     }
 
+    /**
+     * Sets the api key.
+     *
+     * @param string $apiKey The api key
+     *
+     * @throws \InvalidArgumentException 
+     *
+     * @return self 
+     */
     public function setApiKey($apiKey)
     {
         if (empty($apiKey)) {
@@ -43,6 +59,15 @@ class DiCmsApiClient
         return $this;
     }
 
+    /**
+     * Sets the user login.
+     *
+     * @param string $userLogin The user login
+     *
+     * @throws \InvalidArgumentException 
+     *
+     * @return self 
+     */
     public function setUserLogin($userLogin)
     {
         if (empty($userLogin)) {
@@ -55,6 +80,15 @@ class DiCmsApiClient
         return $this;
     }
 
+    /**
+     * Sets the api url.
+     *
+     * @param string $apiUrl The api url
+     *
+     * @throws \InvalidArgumentException 
+     *
+     * @return self 
+     */
     public function setApiUrl($apiUrl)
     {
         if (empty($apiUrl)) {
@@ -73,30 +107,55 @@ class DiCmsApiClient
         return $this;
     }
 
+    /**
+     * Gets the api key.
+     *
+     * @return string The api key.
+     */
     public function getApiKey()
     {
         return $this->apiKey;
     }
 
+    /**
+     * Gets the user login.
+     *
+     * @return string The user login.
+     */
     public function getUserLogin()
     {
         return $this->userLogin;
     }
 
+    /**
+     * Gets the api url.
+     *
+     * @return string The api url.
+     */
     public function getApiUrl()
     {
         return $this->apiUrl;
     }
 
+    /**
+     * Makes a request.
+     *
+     * @param string $objectUrl The object url
+     * @param string $method The method
+     * @param string $data The data
+     * @param array $params The parameters
+     *
+     * @throws \ShopExpress\ApiClient\Exception\CurlException 
+     *
+     * @return \ShopExpress\ApiClient\Response\ApiResponse
+     */
     protected function makeRequest($objectUrl, $method, $data = '', $params = [])
     {
         $ch = curl_init();
 
         $opts = self::$CURL_OPTS;
-        //print_r($params);
         $opts[CURLOPT_URL] = $this->initUrl($objectUrl, $params);
         $opts[CURLOPT_USERPWD] = $this->getAuthString();
-        //print_r($opts);
         $this->setHeader($opts, 'Content-Type: application/json');
 
         if ($method == 'POST' || $method == 'PUT') {
@@ -142,27 +201,61 @@ class DiCmsApiClient
         return $this->parseResult($resultBody, $statusCode);
     }
     
+    /**
+     * @param string $objectUrl The object url
+     * @param array $params The parameters
+     *
+     * @return string The init url
+     */
     protected function initUrl($objectUrl, array $params = [])
     {
         $params = !empty($params)? '?' . http_build_query($params) : '';
         return $this->apiUrl . $objectUrl . $params;
     }
 
+    /**
+     * Gets the auth string.
+     *
+     * @return string The auth string.
+     */
     protected function getAuthString()
     {
         return $this->userLogin . ":" . $this->apiKey;
     }
 
+    /**
+     * Sets the http-request header.
+     *
+     * @param &array $opts The options
+     * @param string $headerString The header string
+     */
     protected function setHeader(&$opts, $headerString)
     {
         $opts[CURLOPT_HTTPHEADER][] = $headerString;
     }
 
+    /**
+     * Convert post array to json.
+     *
+     * @param array $data The data
+     *
+     * @return string Json-string
+     */
     protected function generatePostData($data)
     {
         return json_encode($data);
     }
     
+    /**
+     * Parse result.
+     *
+     * @param string $resultBody The result body
+     * @param int $statusCode The status code
+     *
+     * @throws \ShopExpress\ApiClient\Exception\CsCartApiException
+     *
+     * @return ApiResponse
+     */
     protected function parseResult($resultBody, $statusCode)
     {
         $response = new ApiResponse($statusCode, $resultBody);
@@ -176,6 +269,18 @@ class DiCmsApiClient
         }
     }
 
+    /**
+     * Universal api request method.
+     *
+     * @param string $method The method
+     * @param string $objectUrl The object url
+     * @param string $data The data
+     * @param array $params The parameters
+     *
+     * @throws \InvalidArgumentException 
+     *
+     * @return \ShopExpress\ApiClient\Response\ApiResponse
+     */
     public function api($method, $objectUrl, $data = '', $params = [])
     {
         if (!empty($method) && !empty($objectUrl)) {
@@ -185,21 +290,52 @@ class DiCmsApiClient
         }
     }
     
+    /**
+     * Get api method.
+     *
+     * @param string $objectUrl The object url
+     * @param array $params The parameters
+     *
+     * @return \ShopExpress\ApiClient\Response\ApiResponse
+     */
     public function get($objectUrl, $params = [])
     {
         return $this->api('GET', $objectUrl, '', $params);
     }
 
+    /**
+     * Update api method.
+     *
+     * @param string $objectUrl The object url
+     * @param array $data The data
+     *
+     * @return \ShopExpress\ApiClient\Response\ApiResponse
+     */
     public function update($objectUrl, $data)
     {
         return $this->api('PUT', $objectUrl, $data);
     }
 
+    /**
+     * Create api method.
+     *
+     * @param string $objectUrl The object url
+     * @param array $data The data
+     *
+     * @return \ShopExpress\ApiClient\Response\ApiResponse
+     */
     public function create($objectUrl, $data)
     {
         return $this->api('POST', $objectUrl, $data);
     }
     
+    /**
+     * Delete api method.
+     *
+     * @param string $objectUrl The object url
+     *
+     * @return \ShopExpress\ApiClient\Response\ApiResponse
+     */
     public function delete($objectUrl)
     {
         return $this->api('DELETE', $objectUrl);
