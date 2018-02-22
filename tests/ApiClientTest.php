@@ -10,9 +10,9 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 	public static function setUpBeforeClass()
 	{
 		static::$config = [
-			'apiKey' => '1234',
+			'apiKey' => '1TUgRGyUjsq5d3JD5sRf#oxxX62Z@5lw',
 	        'userLogin' => 'admin',
-	        'apiUrl' => 'http://epetrov.kupikupi.org/adm/api/',
+	        'apiUrl' => 'http://www.newshop.local/adm/api/',
 		];
 	}
 
@@ -170,27 +170,38 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             'pay_status' => 'S',
             'delivery_id' => 1,
             'delivery' => 'courier',
+            'user_unique_key' => 'API',
+            'fields' => [
+                'extraCRM' => 'filled',
+                'extraFieldOne' => 'one',
+                'extraFieldTwo' => 'two',
+            ],
             'products' => [
                 ['oid' => 1117, 'count' => 1],
             ],
     	];
 
-        $response = $instance->update('orders', $someOrder);
-
-        print_r($response);
+        $response = $instance->create('orders', $someOrder);
 
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
             'Order was not created!'
         );
+
         try {
             $this->assertTrue(is_numeric($response->id), 'Order was not created!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not created!');
         }
 
-        return $response->content;
+        try {
+            $this->assertEquals($someOrder['fields']['extraCRM'], $response->content['fields']['extraCRM'], 'Order extra fields not added!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order extra fields not added!');
+        }
+
+        return $response;
     }
 
     /**
@@ -199,7 +210,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOrderRequest($instance, $response)
     {
-        $order_id = $response['order_id'];
+        $order_id = $response->id;
 
         $response = $instance->get("orders/{$order_id}", []);
         $this->assertInstanceOf(
@@ -208,10 +219,8 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             'Order was not received!'
         );
 
-        print_r($response);
-
         try {
-            $this->assertEquals($response->order_id, $order_id, 'Order was not received!');
+            $this->assertEquals($response->content['order_id'], $order_id, 'Order was not received!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not received!');
         }
@@ -225,7 +234,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateOrderRequest($instance, $response)
     {
-        /*$oid = $response->id;
+        $oid = $response->id;
         $newPayStatus = 'FP';
 
         $response = $instance->update("orders/{$oid}", ['pay_status' => $newPayStatus]);
@@ -234,9 +243,6 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             $response,
             'Order was not updated!'
         );
-
-        print_r($response);
-
         try {
             $this->assertEquals($response->id, $oid, 'Order was not received after updating!');
         } catch (\InvalidArgumentException $e) {
@@ -245,9 +251,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
         $response = $instance->get("orders/{$response->id}", []);
 
-        print_r($response);
-
-        $this->assertEquals($response->content['pay_status'], $newPayStatus, 'Order was not updated!');*/
+        $this->assertEquals($response->content['pay_status'], $newPayStatus, 'Order was not updated!');
 
         $this->assertTrue(true);
 
@@ -260,7 +264,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeleteOrderRequest($instance, $response)
     {
-        $response = $instance->delete("orders/{$response->order_id}");
+        $response = $instance->delete("orders/{$response->id}");
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,

@@ -1,6 +1,6 @@
 <?php
 namespace ShopExpress\ApiClient\Exception;
 
-class CsCartApiException extends \RuntimeException
+class ApiException extends \RuntimeException
 {
 }
