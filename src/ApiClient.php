@@ -252,7 +252,7 @@ class ApiClient
      * @param string $resultBody The result body
      * @param int $statusCode The status code
      *
-     * @throws \ShopExpress\ApiClient\Exception\CsCartApiException
+     * @throws \ShopExpress\ApiClient\Exception\ApiException
      *
      * @return ApiResponse
      */
@@ -261,7 +261,7 @@ class ApiClient
         $response = new ApiResponse($statusCode, $resultBody);
 
         if (!empty($response['message'])) {
-            throw new CsCartApiException(
+            throw new ApiException(
                 sprintf(self::ERROR_API_MESSAGE, $response['message'])
             );
         } else {
