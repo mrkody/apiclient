@@ -10,31 +10,30 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 	public static function setUpBeforeClass()
 	{
 		static::$config = [
-			'apiKey' => '1234',
-	        'userLogin' => 'admin',
-	        'apiUrl' => 'http://epetrov.kupikupi.org/adm/api/',
+			'apiKey' => getenv('SHOPEXPRESS_API_KEY'),
+	        'userLogin' => getenv('SHOPEXPRESS_USER_LOGIN'),
+	        'apiUrl' => getenv('SHOPEXPRESS_API_URL'),
 		];
 	}
 
 	public function simpleQuery($instance)
-	{
-		return $instance->get("groups", ['start' => 0, 'limit' => 1]);
-	}
-	
-	/**
-	 * @dataProvider invalidInitConfigProvider
-	 * @expectedException \InvalidArgumentException
-	 */
-	public function testInvalidInit($apiKey, $userLogin, $apiUrl)
     {
-    	$instance = new ApiClient($apiKey, $userLogin, $apiUrl);
+        return $instance->get("groups", ['start' => 0, 'limit' => 1]);
     }
-
+    
+    /**
+     * @dataProvider invalidInitConfigProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidInit($apiKey, $userLogin, $apiUrl)
+    {
+        $instance = new ApiClient($apiKey, $userLogin, $apiUrl);
+    }
+    
     public function testValidInit()
     {
-    	$instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], static::$config['apiUrl']);
-
-    	return $instance;
+        $instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], static::$config['apiUrl']);
+        return $instance;
     }
 
     /**
@@ -42,10 +41,9 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendValidInitRequest($instance)
     {
-    	$response = $this->simpleQuery($instance);
+        $response = $this->simpleQuery($instance);
         $this->assertInstanceOf('ShopExpress\ApiClient\Response\ApiResponse', $response);
         $this->assertEquals(200, $response->getStatusCode());
-
         return $instance;
     }
 
@@ -54,8 +52,8 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest()
     {
-    	$instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "http://example.ru");
-    	$response = $this->simpleQuery($instance);
+        $instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "http://example.ru");
+        $response = $this->simpleQuery($instance);
     }
 
     /**
@@ -63,8 +61,8 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest1()
     {
-    	$instance = new ApiClient("wrong", static::$config['userLogin'], static::$config['apiUrl']);
-    	$response = $this->simpleQuery($instance);
+        $instance = new ApiClient("wrong", static::$config['userLogin'], static::$config['apiUrl']);
+        $response = $this->simpleQuery($instance);
     }
 
     /**
@@ -72,8 +70,8 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest2()
     {
-    	$instance = new ApiClient(static::$config['apiKey'], "wrong", static::$config['apiUrl']);
-    	$response = $this->simpleQuery($instance);
+        $instance = new ApiClient(static::$config['apiKey'], "wrong", static::$config['apiUrl']);
+        $response = $this->simpleQuery($instance);
     }
 
     /**
@@ -81,8 +79,8 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidInitRequest3()
     {
-    	$instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "example.ru");
-    	$response = $this->simpleQuery($instance);
+        $instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "example.ru");
+        $response = $this->simpleQuery($instance);
     }
 
     /**
@@ -91,8 +89,8 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidObjectUrlForGet($instance)
     {
-    	$response = $instance->get("");
-	}
+        $response = $instance->get("");
+    }
 
     /**
      * @depends testSendValidInitRequest
@@ -100,7 +98,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidObjectUrlForUpdate($instance)
     {
-    	$response = $instance->update("", []);
+        $response = $instance->update("", []);
     }
 
     /**
@@ -109,24 +107,24 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendInvalidObjectUrlForCreate($instance)
     {
-    	$response = $instance->create("", []);
-	}
+        $response = $instance->create("", []);
+    }
 
-	/**
+    /**
      * @depends testSendValidInitRequest
      * @expectedException \InvalidArgumentException
      */
     public function testSendInvalidObjectUrlForDelete($instance)
     {
-    	$response = $instance->delete("", []);
-	}
+        $response = $instance->delete("", []);
+    }
 
     /**
      * @depends testValidInit
      */
     public function testGetApiKey($instance)
     {
-    	$this->assertEquals(static::$config['apiKey'], $instance->getApiKey());
+        $this->assertEquals(static::$config['apiKey'], $instance->getApiKey());
     }
 
     /**
@@ -134,7 +132,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUserLogin($instance)
     {
-    	$this->assertEquals(static::$config['userLogin'], $instance->getUserLogin());
+        $this->assertEquals(static::$config['userLogin'], $instance->getUserLogin());
     }
 
     /**
@@ -142,7 +140,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetApiUrl($instance)
     {
-    	$this->assertEquals(static::$config['apiUrl'], $instance->getApiUrl());
+        $this->assertEquals(static::$config['apiUrl'], $instance->getApiUrl());
     }
 
     /**
@@ -150,16 +148,15 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetApiVersion($instance)
     {
-    	$this->assertTrue(!empty($instance->getApiVersion()));
+        $this->assertTrue(!empty($instance->getApiVersion()));
     }
-
 
     /**
      * @depends testValidInit
      */
     public function testCreateOrderRequest($instance)
     {
-    	$someOrder = [
+        $someOrder = [
             'master_oid' => 3,
             'fio' => 'Ivanov Ivan Ivanovich',
             'email' => 'ivan12@mail.ru',
@@ -170,15 +167,17 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             'pay_status' => 'S',
             'delivery_id' => 1,
             'delivery' => 'courier',
+            'user_unique_key' => 'API',
+            'fields' => [
+                'extraCRM' => 'filled',
+                'extraFieldOne' => 'one',
+                'extraFieldTwo' => 'two',
+            ],
             'products' => [
                 ['oid' => 1117, 'count' => 1],
             ],
-    	];
-
-        $response = $instance->update('orders', $someOrder);
-
-        print_r($response);
-
+        ];
+        $response = $instance->create('orders', $someOrder);
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
@@ -189,8 +188,12 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not created!');
         }
-
-        return $response->content;
+        try {
+            $this->assertEquals($someOrder['fields']['extraCRM'], $response->content['fields']['extraCRM'], 'Order extra fields not added!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order extra fields not added!');
+        }
+        return $response;
     }
 
     /**
@@ -199,23 +202,18 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOrderRequest($instance, $response)
     {
-        $order_id = $response['order_id'];
-
+        $order_id = $response->id;
         $response = $instance->get("orders/{$order_id}", []);
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
             'Order was not received!'
         );
-
-        print_r($response);
-
         try {
-            $this->assertEquals($response->order_id, $order_id, 'Order was not received!');
+            $this->assertEquals($response->content['order_id'], $order_id, 'Order was not received!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not received!');
         }
-
         return $response;
     }
 
@@ -225,32 +223,22 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testUpdateOrderRequest($instance, $response)
     {
-        /*$oid = $response->id;
+        $oid = $response->id;
         $newPayStatus = 'FP';
-
         $response = $instance->update("orders/{$oid}", ['pay_status' => $newPayStatus]);
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
             'Order was not updated!'
         );
-
-        print_r($response);
-
         try {
             $this->assertEquals($response->id, $oid, 'Order was not received after updating!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not received after updating!');
         }
-
         $response = $instance->get("orders/{$response->id}", []);
-
-        print_r($response);
-
-        $this->assertEquals($response->content['pay_status'], $newPayStatus, 'Order was not updated!');*/
-
+        $this->assertEquals($response->content['pay_status'], $newPayStatus, 'Order was not updated!');
         $this->assertTrue(true);
-
         return $response;
     }
 
@@ -260,31 +248,30 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeleteOrderRequest($instance, $response)
     {
-        $response = $instance->delete("orders/{$response->order_id}");
+        $response = $instance->delete("orders/{$response->id}");
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
             'Order was not deleted!'
         );
-
         print_r($response);
     }
 
     public function invalidInitConfigProvider()
     {
-    	return [
-    		["", "s", "s"],
-    		["s", "", "s"],
-    		["s", "s", ""],
-    		["", "", "s"],
-    		["s", "", ""],
-    		["", "s", ""],
-    		["", "", "example.ru"],
-    	];
+        return [
+            ["", "s", "s"],
+            ["s", "", "s"],
+            ["s", "s", ""],
+            ["", "", "s"],
+            ["s", "", ""],
+            ["", "s", ""],
+            ["", "", "example.ru"],
+        ];
     }
 
     public static function tearDownAfterClass()
     {
-    	static::$config = null;
+        static::$config = null;
     }
 }

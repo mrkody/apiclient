@@ -23,4 +23,9 @@
         <log type="coverage-html" target="build/coverage" charset="UTF-8" yui="true" highlight="true"/>
         <log type="coverage-text" target="build/coverage.txt"/>
     </logging>
+    <php>
+        <env name="API_KEY" value="" />
+        <env name="USER_LOGIN" value="" />
+        <env name="API_URL" value="" />
+    </php>
 </phpunit>
