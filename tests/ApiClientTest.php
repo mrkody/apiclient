@@ -2,6 +2,7 @@
 namespace ShopExpress\ApiClient\Test;
 
 use ShopExpress\ApiClient\ApiClient;
+use ShopExpress\ApiClient\Response\ApiResponse;
 
 class ApiClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,15 +48,6 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         return $instance;
-    }
-
-    /**
-     * @expectedException ShopExpress\ApiClient\Exception\InvalidJsonException
-     */
-    public function testSendInvalidInitRequest()
-    {
-    	$instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "http://example.ru");
-    	$response = $this->simpleQuery($instance);
     }
 
     /**
@@ -260,6 +252,60 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testValidInit
+     * @depends testGetOrderRequest
+     *
+     * @param ApiClient $instance
+     * @param ApiResponse $response
+     *
+     * @return ApiResponse
+     */
+    public function testUpdateProductCount($instance, $response)
+    {
+        $oid = $response->id;
+        $response = $instance->update(
+            "orders/{$oid}",
+            [
+                'products' => [
+                    ['oid' => 1117, 'count' => 10],
+                    ['oid' => 139, 'count' => 5],
+                ],
+            ]
+        );
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Order was not updated!'
+        );
+
+        try {
+            $this->assertEquals($response->id, $oid, 'Order was not received after updating!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order was not received after updating!');
+        }
+
+        $response = $instance->get("orders/{$response->id}", []);
+
+        $count = array_sum(
+            array_map(
+                function ($a) {
+                    return $a['count'];
+                },
+                $response->content['ordercontent']
+            )
+        );
+
+        $this->assertEquals(
+            $count,
+            15,
+            'Order was not updated!'
+        );
+
+        $this->assertTrue(true);
+
+        return $response;
+    }
+    /**
+     * @depends testValidInit
      * @depends testUpdateOrderRequest
      */
     public function testDeleteOrderRequest($instance, $response)
@@ -270,8 +316,6 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             $response,
             'Order was not deleted!'
         );
-
-        print_r($response);
     }
 
     public function invalidInitConfigProvider()

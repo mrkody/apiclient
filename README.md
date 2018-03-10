@@ -1,6 +1,8 @@
 # init apiclient
 ```
-$ApiClient = new DiCMSApiClient(
+use ShopExpress\ApiClient\ApiClient;
+use ShopExpress\ApiClient\Response\ApiResponse;
+$ApiClient = new ApiClient(
     array(
         'login' => 'admin',
         'api_key' => 'API_KEY',
@@ -16,11 +18,11 @@ $groups = $ApiClient->get("groups", array( start => 0 , limit =>10 ));
 ###get all users from group id 131
 ```
 $users = $ApiClient->get("users",
-    array(
+    [
         parent_oid => 131,
         start => 0,
         limit =>10
-    )
+    ]
 );
 ```
 ###get all user information
@@ -31,10 +33,7 @@ $users = $ApiClient->get("users/3", array( ));
 You could set some user fields, for example 'carma' with user id 3
 ```
 $users = $ApiClient->update(
-    "users/3",
-    array(
-        'content' => array( carma => 1000 )
-    )
+    "users/3", [ 'content' => [ 'carma' => 1000 ] ]
 );
 ```
 ###create new user
@@ -51,7 +50,7 @@ $users = $ApiClient->create("users", $data );
 ```
 $order = $siteApi->create(
     'orders',
-    array(
+    [
         'email' => 'test@test',
         'phone' => '',
 
@@ -63,9 +62,29 @@ $order = $siteApi->create(
         'paid' => 0,
 
         'pay_method' => 'BALANCE',
-        'pay_status' => 'FP',
+        'pay_status' => 'S',
 
         'master_oid' => 3,
-    )
+    ]
+);
+```
+###update exists order
+```
+$order = $siteApi->update(
+    'orders/10',
+    [
+        'pay_status' => 'FP',
+        'products' => [
+            [
+                'oid' => 1117,
+                'count' => 1,
+                'params' => ['color' => 0]
+            ],
+            [
+                'oid' => 1117,
+                'count' => 1
+            ],
+        ],
+    ]
 );
 ```
