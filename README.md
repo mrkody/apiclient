@@ -10,12 +10,12 @@ $ApiClient = new ApiClient(
     )
 );
 ```
-##getters
-###get groups
+## getters
+### get groups
 ```
 $groups = $ApiClient->get("groups", array( start => 0 , limit =>10 ));
 ```
-###get all users from group id 131
+### get all users from group id 131
 ```
 $users = $ApiClient->get("users",
     [
@@ -25,18 +25,18 @@ $users = $ApiClient->get("users",
     ]
 );
 ```
-###get all user information
+### get all user information
 ```
 $users = $ApiClient->get("users/3", array( ));
 ```
-###set user fields
+### set user fields
 You could set some user fields, for example 'carma' with user id 3
 ```
 $users = $ApiClient->update(
     "users/3", [ 'content' => [ 'carma' => 1000 ] ]
 );
 ```
-###create new user
+### create new user
 ```
 $data = array(
     login => 'unique@mail.ru'
@@ -46,7 +46,7 @@ $data = array(
 );
 $users = $ApiClient->create("users", $data );
 ```
-###create new order
+### create new order
 ```
 $order = $siteApi->create(
     'orders',
@@ -68,7 +68,7 @@ $order = $siteApi->create(
     ]
 );
 ```
-###update exists order
+### update exists order
 ```
 $order = $siteApi->update(
     'orders/10',
