@@ -2,6 +2,7 @@
 namespace ShopExpress\ApiClient\Test;
 
 use ShopExpress\ApiClient\ApiClient;
+use ShopExpress\ApiClient\Response\ApiResponse;
 
 class ApiClientTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,15 +46,6 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ShopExpress\ApiClient\Response\ApiResponse', $response);
         $this->assertEquals(200, $response->getStatusCode());
         return $instance;
-    }
-
-    /**
-     * @expectedException ShopExpress\ApiClient\Exception\InvalidJsonException
-     */
-    public function testSendInvalidInitRequest()
-    {
-        $instance = new ApiClient(static::$config['apiKey'], static::$config['userLogin'], "http://example.ru");
-        $response = $this->simpleQuery($instance);
     }
 
     /**
@@ -176,23 +168,28 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             'products' => [
                 ['oid' => 1117, 'count' => 1],
             ],
-        ];
+    	];
+
         $response = $instance->create('orders', $someOrder);
+
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
             'Order was not created!'
         );
+
         try {
             $this->assertTrue(is_numeric($response->id), 'Order was not created!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not created!');
         }
+
         try {
             $this->assertEquals($someOrder['fields']['extraCRM'], $response->content['fields']['extraCRM'], 'Order extra fields not added!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order extra fields not added!');
         }
+
         return $response;
     }
 
@@ -203,17 +200,46 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
     public function testGetOrderRequest($instance, $response)
     {
         $order_id = $response->id;
+
         $response = $instance->get("orders/{$order_id}", []);
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse', 
             $response,
             'Order was not received!'
         );
+
         try {
             $this->assertEquals($response->content['order_id'], $order_id, 'Order was not received!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not received!');
         }
+        return $response;
+    }
+    /**
+     * @depends testValidInit
+     */
+    public function testFilterOrder($instance)
+    {
+        $statuses = ['M', 'O', 'C'];
+        $response = $instance->get("orders", [
+            'limit' => 100,
+            'status' => $statuses
+        ]);
+
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Order was not received!'
+        );
+
+        try {
+            foreach ($response['orders'] as $order) {
+                $this->assertContains($order['status'], $statuses, 'Order was not filtered!');
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order was not filtered!');
+        }
+
         return $response;
     }
 
@@ -236,12 +262,68 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not received after updating!');
         }
+
         $response = $instance->get("orders/{$response->id}", []);
+
         $this->assertEquals($response->content['pay_status'], $newPayStatus, 'Order was not updated!');
+
         $this->assertTrue(true);
+
         return $response;
     }
 
+    /**
+     * @depends testValidInit
+     * @depends testGetOrderRequest
+     *
+     * @param ApiClient $instance
+     * @param ApiResponse $response
+     *
+     * @return ApiResponse
+     */
+    public function testUpdateProductCount($instance, $response)
+    {
+        $oid = $response->id;
+        $response = $instance->update(
+            "orders/{$oid}",
+            [
+                'products' => [
+                    ['oid' => 1117, 'count' => 10],
+                    ['oid' => 139, 'count' => 5],
+                ],
+            ]
+        );
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Order was not updated!'
+        );
+
+        try {
+            $this->assertEquals($response->id, $oid, 'Order was not received after updating!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order was not received after updating!');
+        }
+        $response = $instance->get("orders/{$response->id}", []);
+
+        $count = array_sum(
+            array_map(
+                function ($a) {
+                    return $a['count'];
+                },
+                $response->content['ordercontent']
+            )
+        );
+
+        $this->assertEquals(
+            $count,
+            15,
+            'Order was not updated!'
+        );
+
+        $this->assertTrue(true);
+        return $response;
+    }
     /**
      * @depends testValidInit
      * @depends testUpdateOrderRequest
@@ -254,7 +336,6 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             $response,
             'Order was not deleted!'
         );
-        print_r($response);
     }
 
     public function invalidInitConfigProvider()
