@@ -219,6 +219,33 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
         return $response;
     }
+    /**
+     * @depends testValidInit
+     */
+    public function testFilterOrder($instance)
+    {
+        $statuses = ['M', 'O', 'C'];
+        $response = $instance->get("orders", [
+            'limit' => 100,
+            'status' => $statuses
+        ]);
+
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Order was not received!'
+        );
+
+        try {
+            foreach ($response['orders'] as $order) {
+                $this->assertContains($order['status'], $statuses, 'Order was not filtered!');
+            }
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order was not filtered!');
+        }
+
+        return $response;
+    }
 
     /**
      * @depends testValidInit
