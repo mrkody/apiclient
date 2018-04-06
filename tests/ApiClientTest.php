@@ -249,6 +249,53 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @depends testValidInit
+     */
+    public function testCreateOrderStatus($instance)
+    {
+        $instance->create('order_status', [
+            'code' => 'TEST',
+            'name' => 'Тестовый статус'
+        ]);
+
+        $response = $instance->get('order_status');
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Statuses was not received!'
+        );
+
+        try {
+            $this->assertEquals('Тестовый статус', $response['TEST'], 'Order status not created !');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order status not created!');
+        }
+
+        return $response;
+    }
+    /**
+     * @depends testValidInit
+     */
+    public function testDeleteOrderStatus($instance)
+    {
+        $response = $instance->delete('order_status/TEST');
+
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Statuses was not received!'
+        );
+
+        try {
+            $this->assertArrayNotHasKey('TEST', $response, 'Order status not deleted!');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order was not filtered!');
+        }
+
+        return $response;
+    }
+
+    /**
+     * @depends testValidInit
      * @depends testGetOrderRequest
      */
     public function testUpdateOrderRequest($instance, $response)
