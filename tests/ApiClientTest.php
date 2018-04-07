@@ -169,10 +169,17 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
                 'extraFieldTwo' => 'two',
             ],
             'products' => [
-                ['oid' => 1117, 'count' => 1],
+                [
+                    'oid' => 1297,
+                    'count' => 1,
+                    'discount' => 86,
+                    'params' => [
+                        'params' => 1,
+                        'color' => 1
+                    ]
+                ],
             ],
     	];
-
         $response = $instance->create('orders', $someOrder);
 
         $this->assertInstanceOf(
@@ -372,7 +379,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $count,
-            15,
+            16,
             'Order was not updated!'
         );
 
