@@ -219,8 +219,11 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
         return $response;
     }
+
     /**
      * @depends testValidInit
+     * @param ApiClient $instance
+     * @return
      */
     public function testFilterOrder($instance)
     {
@@ -229,7 +232,6 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             'limit' => 100,
             'status' => $statuses
         ]);
-
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse',
             $response,
@@ -265,7 +267,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
         );
 
         try {
-            $this->assertEquals('Тестовый статус', $response['TEST'], 'Order status not created !');
+            $this->assertEquals('Тестовый статус', $response['order_status']['TEST'], 'Order status not created !');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order status not created!');
         }
