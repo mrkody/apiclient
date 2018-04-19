@@ -6,18 +6,18 @@ use ShopExpress\ApiClient\Response\ApiResponse;
 
 class ApiClientTest extends \PHPUnit_Framework_TestCase
 {
-	protected static $config;
+    protected static $config;
 
-	public static function setUpBeforeClass()
-	{
-		static::$config = [
-			'apiKey' => getenv('SHOPEXPRESS_API_KEY'),
-	        'userLogin' => getenv('SHOPEXPRESS_USER_LOGIN'),
-	        'apiUrl' => getenv('SHOPEXPRESS_API_URL'),
-		];
-	}
+    public static function setUpBeforeClass()
+    {
+        static::$config = [
+            'apiKey' => getenv('SHOPEXPRESS_API_KEY'),
+            'userLogin' => getenv('SHOPEXPRESS_USER_LOGIN'),
+            'apiUrl' => getenv('SHOPEXPRESS_API_URL'),
+        ];
+    }
 
-	public function simpleQuery($instance)
+    public function simpleQuery($instance)
     {
         return $instance->get("groups", ['start' => 0, 'limit' => 1]);
     }
@@ -168,12 +168,12 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             'products' => [
                 ['oid' => 1117, 'count' => 1],
             ],
-    	];
+        ];
 
         $response = $instance->create('orders', $someOrder);
 
         $this->assertInstanceOf(
-            'ShopExpress\ApiClient\Response\ApiResponse', 
+            'ShopExpress\ApiClient\Response\ApiResponse',
             $response,
             'Order was not created!'
         );
@@ -203,7 +203,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
         $response = $instance->get("orders/{$order_id}", []);
         $this->assertInstanceOf(
-            'ShopExpress\ApiClient\Response\ApiResponse', 
+            'ShopExpress\ApiClient\Response\ApiResponse',
             $response,
             'Order was not received!'
         );
@@ -253,7 +253,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
         $newPayStatus = 'FP';
         $response = $instance->update("orders/{$oid}", ['pay_status' => $newPayStatus]);
         $this->assertInstanceOf(
-            'ShopExpress\ApiClient\Response\ApiResponse', 
+            'ShopExpress\ApiClient\Response\ApiResponse',
             $response,
             'Order was not updated!'
         );
@@ -332,7 +332,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
     {
         $response = $instance->delete("orders/{$response->id}");
         $this->assertInstanceOf(
-            'ShopExpress\ApiClient\Response\ApiResponse', 
+            'ShopExpress\ApiClient\Response\ApiResponse',
             $response,
             'Order was not deleted!'
         );
