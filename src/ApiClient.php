@@ -158,24 +158,20 @@ class ApiClient
         $opts[CURLOPT_USERPWD] = $this->getAuthString();
         $this->setHeader($opts, 'Content-Type: application/json');
 
-        if ($method == 'POST' || $method == 'PUT') {
-            $postdata = $this->generatePostData($data);
-        } else {
-            unset($data);
-        }
-        
         switch ($method) {
             case 'GET':
                 break;
             case 'POST':
                 $opts[CURLOPT_CUSTOMREQUEST] = 'POST';
                 $opts[CURLOPT_RETURNTRANSFER] = true;
+                $postdata = $this->generatePostData($data);
                 $opts[CURLOPT_POSTFIELDS] = $postdata;
                 $this->setHeader($opts, 'Content-Length: ' . strlen($postdata));
                 break;
             case 'PUT':
                 $opts[CURLOPT_CUSTOMREQUEST] = 'PUT';
                 $opts[CURLOPT_RETURNTRANSFER] = true;
+                $postdata = $this->generatePostData($data);
                 $opts[CURLOPT_POSTFIELDS] = $postdata;
                 $this->setHeader($opts, 'Content-Length: ' . strlen($postdata));
                 break;

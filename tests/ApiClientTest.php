@@ -166,9 +166,18 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
                 'extraFieldTwo' => 'two',
             ],
             'products' => [
-                ['oid' => 1117, 'count' => 1],
+                [
+                    'oid' => 1297,
+                    'count' => 1,
+                    'discount' => 86,
+                    'params' => [
+                        'params' => 1,
+                        'color' => 1
+                    ]
+                ],
             ],
         ];
+
 
         $response = $instance->create('orders', $someOrder);
 
@@ -215,8 +224,11 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
         }
         return $response;
     }
+
     /**
      * @depends testValidInit
+     * @param ApiClient $instance
+     * @return
      */
     public function testFilterOrder($instance)
     {
@@ -225,7 +237,6 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             'limit' => 100,
             'status' => $statuses
         ]);
-
         $this->assertInstanceOf(
             'ShopExpress\ApiClient\Response\ApiResponse',
             $response,
@@ -236,6 +247,53 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
             foreach ($response['orders'] as $order) {
                 $this->assertContains($order['status'], $statuses, 'Order was not filtered!');
             }
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order was not filtered!');
+        }
+
+        return $response;
+    }
+
+    /**
+     * @depends testValidInit
+     */
+    public function testCreateOrderStatus($instance)
+    {
+        $instance->create('order_status', [
+            'code' => 'TEST',
+            'name' => 'Тестовый статус'
+        ]);
+
+        $response = $instance->get('order_status');
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Statuses was not received!'
+        );
+
+        try {
+            $this->assertEquals('Тестовый статус', $response['order_status']['TEST'], 'Order status not created !');
+        } catch (\InvalidArgumentException $e) {
+            $this->fail('Order status not created!');
+        }
+
+        return $response;
+    }
+    /**
+     * @depends testValidInit
+     */
+    public function testDeleteOrderStatus($instance)
+    {
+        $response = $instance->delete('order_status/TEST');
+
+        $this->assertInstanceOf(
+            'ShopExpress\ApiClient\Response\ApiResponse',
+            $response,
+            'Statuses was not received!'
+        );
+
+        try {
+            $this->assertArrayNotHasKey('TEST', $response, 'Order status not deleted!');
         } catch (\InvalidArgumentException $e) {
             $this->fail('Order was not filtered!');
         }
@@ -317,7 +375,7 @@ class ApiClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $count,
-            15,
+            16,
             'Order was not updated!'
         );
 
